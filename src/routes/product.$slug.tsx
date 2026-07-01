@@ -9,7 +9,7 @@ import { Minus, Plus } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { ProductRating } from "@/components/product-rating";
 import { buildMeta, productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { resolveProductImages } from "@/lib/images";
+import { resolveProductImages, isVideoUrl } from "@/lib/images";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params }) => {
@@ -106,19 +106,36 @@ function ProductPage() {
 
             <div className="grid gap-10 md:grid-cols-2">
               <div>
-                <div className="aspect-square overflow-hidden rounded-lg border border-border bg-muted">
-                  <ProductImage
-                    src={images[activeImg]}
-                    slug={product.slug}
-                    alt={`${product.name} — SkyGear professional drone`}
-                    className="size-full object-cover"
-                  />
+              <div className="aspect-square overflow-hidden rounded-lg border border-border bg-muted">
+                  {isVideoUrl(images[activeImg]) ? (
+                    <video
+                      key={images[activeImg]}
+                      src={images[activeImg]}
+                      controls
+                      className="size-full object-cover"
+                      aria-label={`${product.name} — product video`}
+                    />
+                  ) : (
+                    <ProductImage
+                      src={images[activeImg]}
+                      slug={product.slug}
+                      alt={`${product.name} — SkyGear professional drone`}
+                      className="size-full object-cover"
+                    />
+                  )}
                 </div>
                 {images.length > 1 && (
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
                     {images.map((im, i) => (
-                      <button key={i} onClick={() => setActiveImg(i)} className={`size-16 overflow-hidden rounded border-2 ${i === activeImg ? "border-primary" : "border-border"}`}>
-                        <ProductImage src={im} slug={product.slug} alt="" className="size-full object-cover" />
+                      <button key={i} onClick={() => setActiveImg(i)} className={`relative size-16 shrink-0 overflow-hidden rounded border-2 ${i === activeImg ? "border-primary" : "border-border"}`}>
+                        {isVideoUrl(im) ? (
+                          <>
+                            <video src={im} className="size-full object-cover" muted />
+                            <span className="pointer-events-none absolute left-0.5 top-0.5 rounded bg-black/70 px-1 py-px text-[8px] font-bold uppercase text-white">▶</span>
+                          </>
+                        ) : (
+                          <ProductImage src={im} slug={product.slug} alt="" className="size-full object-cover" />
+                        )}
                       </button>
                     ))}
                   </div>

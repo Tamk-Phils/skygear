@@ -57,9 +57,21 @@ export function resolveImageUrl(url: string | null | undefined, slug?: string): 
   return IMAGES.placeholder;
 }
 
+/** Returns true for URLs pointing to a video file. */
+export function isVideoUrl(url: string): boolean {
+  return /\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i.test(url);
+}
+
 export function resolveProductImages(images: string[] | null | undefined, slug: string): string[] {
+  // Prefer uploaded (Supabase / http) images — they're the admin's intent.
+  const uploaded = images?.filter((img) => img.startsWith("http"));
+  if (uploaded?.length) return uploaded;
+
+  // Fall back to local slug-keyed images bundled with the app.
   const primary = productImage(slug);
   if (primary) return [primary];
+
+  // Last resort: resolve whatever URL strings exist.
   if (!images?.length) return [IMAGES.placeholder];
   return images.map((img) => resolveImageUrl(img, slug));
 }

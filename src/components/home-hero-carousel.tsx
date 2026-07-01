@@ -47,7 +47,7 @@ export function HomeHeroCarousel() {
     const onSelect = () => setCurrent(api.selectedScrollSnap());
     api.on("select", onSelect);
     onSelect();
-    return () => api.off("select", onSelect);
+    return () => { api.off("select", onSelect); };
   }, [api]);
 
   useEffect(() => {

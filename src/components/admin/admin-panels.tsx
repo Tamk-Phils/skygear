@@ -94,75 +94,163 @@ const emptyProductForm = {
   stock: "10",
   short_description: "",
   description: "",
-  image_url: "",
+  images: [] as string[],
   category_id: "",
   is_featured: false,
   is_published: true,
 };
 
-function AdminImageUpload({ 
-  value, 
-  onChange, 
-  disabled 
-}: { 
-  value: string; 
-  onChange: (url: string) => void;
+function isVideoUrl(url: string) {
+  return /\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i.test(url);
+}
+
+function AdminMediaUpload({
+  values,
+  onChange,
+  disabled,
+  bucket = "product-images",
+}: {
+  values: string[];
+  onChange: (urls: string[]) => void;
   disabled?: boolean;
+  bucket?: string;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
 
-  const uploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
     setUploading(true);
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(fileName, file);
-
-    if (uploadError) {
-      toast.error(uploadError.message);
-      setUploading(false);
-      return;
+    const uploaded: string[] = [];
+    for (const file of files) {
+      const ext = file.name.split(".").pop();
+      const name = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+      const { error } = await supabase.storage.from(bucket).upload(name, file);
+      if (error) { toast.error(`${file.name}: ${error.message}`); continue; }
+      const { data } = supabase.storage.from(bucket).getPublicUrl(name);
+      uploaded.push(data.publicUrl);
     }
-
-    const { data } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(fileName);
-
-    onChange(data.publicUrl);
+    if (uploaded.length) {
+      onChange([...values, ...uploaded]);
+      toast.success(`${uploaded.length} file(s) uploaded`);
+    }
     setUploading(false);
-    toast.success("Image uploaded successfully");
+    e.target.value = "";
+  };
+
+  const remove = (i: number) => onChange(values.filter((_, idx) => idx !== i));
+
+  const move = (from: number, to: number) => {
+    const arr = [...values];
+    const [item] = arr.splice(from, 1);
+    arr.splice(to, 0, item);
+    onChange(arr);
+  };
+
+  const addUrl = () => {
+    const val = urlInput.trim();
+    if (!val) return;
+    onChange([...values, val]);
+    setUrlInput("");
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="https://..."
-        className={adminInput}
-        disabled={disabled || uploading}
-      />
-      <div className="flex items-center gap-2">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={uploadFile}
-          disabled={disabled || uploading}
-          className="text-sm text-muted-foreground file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
-        />
-        {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
-      </div>
-      {value && (
-        <div className="mt-2 size-20 overflow-hidden rounded border border-border bg-muted">
-          <img src={value} alt="Preview" className="size-full object-cover" />
+    <div className="flex flex-col gap-3">
+      {values.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {values.map((url, i) => (
+            <div
+              key={i}
+              className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
+            >
+              {isVideoUrl(url) ? (
+                <video src={url} className="size-full object-cover" muted />
+              ) : (
+                <img src={url} alt="" className="size-full object-cover" />
+              )}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex gap-1">
+                  {i > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => move(i, i - 1)}
+                      className="rounded bg-white/90 px-2 py-1 text-xs font-bold text-black hover:bg-white"
+                      title="Move left"
+                    >
+                      ←
+                    </button>
+                  )}
+                  {i < values.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => move(i, i + 1)}
+                      className="rounded bg-white/90 px-2 py-1 text-xs font-bold text-black hover:bg-white"
+                      title="Move right"
+                    >
+                      →
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  className="rounded bg-red-500 px-2 py-1 text-xs font-bold text-white hover:bg-red-600"
+                >
+                  Remove
+                </button>
+              </div>
+              {i === 0 && (
+                <span className="pointer-events-none absolute bottom-0 left-0 right-0 bg-primary/80 py-0.5 text-center text-[10px] font-bold uppercase text-white">
+                  Main
+                </span>
+              )}
+              {isVideoUrl(url) && (
+                <span className="pointer-events-none absolute left-1 top-1 rounded bg-black/70 px-1 py-0.5 text-[9px] font-bold uppercase text-white">
+                  Video
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       )}
+
+      <label
+        className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border px-4 py-4 text-sm text-muted-foreground transition hover:border-primary hover:text-primary ${
+          uploading || disabled ? "cursor-not-allowed opacity-50" : ""
+        }`}
+      >
+        <input
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          onChange={uploadFiles}
+          disabled={disabled || uploading}
+          className="sr-only"
+        />
+        <span className="text-lg">{uploading ? "⏳" : "📎"}</span>
+        {uploading ? "Uploading…" : `Add images or videos${values.length ? " (more)" : ""}`}
+      </label>
+
+      <div className="flex gap-2">
+        <input
+          type="url"
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addUrl(); } }}
+          placeholder="Or paste URL…"
+          className={`${adminInput} flex-1`}
+          disabled={disabled}
+        />
+        <button
+          type="button"
+          onClick={addUrl}
+          disabled={!urlInput.trim() || disabled}
+          className="shrink-0 rounded-lg border border-border px-3 py-2 text-sm hover:bg-accent disabled:opacity-40"
+        >
+          Add
+        </button>
+      </div>
     </div>
   );
 }
@@ -302,7 +390,7 @@ export function ProductsPanel() {
       stock: String(p.stock),
       short_description: p.short_description ?? "",
       description: p.description ?? "",
-      image_url: p.images?.[0] ?? "",
+      images: p.images ?? [],
       category_id: p.category_id ?? "",
       is_featured: p.is_featured,
       is_published: p.is_published,
@@ -321,7 +409,7 @@ export function ProductsPanel() {
       stock: Number(form.stock),
       short_description: form.short_description || null,
       description: form.description || null,
-      images: form.image_url ? [form.image_url] : [],
+      images: form.images,
       category_id: form.category_id || null,
       is_featured: form.is_featured,
       is_published: form.is_published,
@@ -543,10 +631,10 @@ export function ProductsPanel() {
                 ))}
               </select>
             </AdminField>
-            <AdminField label="Image">
-              <AdminImageUpload
-                value={form.image_url}
-                onChange={(url) => setForm({ ...form, image_url: url })}
+            <AdminField label="Images & Videos">
+              <AdminMediaUpload
+                values={form.images}
+                onChange={(urls) => setForm({ ...form, images: urls })}
                 disabled={busy}
               />
             </AdminField>
@@ -745,9 +833,9 @@ export function CategoriesPanel() {
               />
             </AdminField>
             <AdminField label="Image">
-              <AdminImageUpload
-                value={form.image_url}
-                onChange={(url) => setForm({ ...form, image_url: url })}
+              <AdminMediaUpload
+                values={form.image_url ? [form.image_url] : []}
+                onChange={(urls) => setForm({ ...form, image_url: urls[0] ?? "" })}
               />
             </AdminField>
             <Button type="submit" className="w-full">
