@@ -31,7 +31,7 @@ export default defineConfig(({ command, mode }) => {
             externals: {
               trace: false,
             },
-          }),
+          } as any),
         ]
       : []),
     viteReact(),
