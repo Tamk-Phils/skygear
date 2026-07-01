@@ -5,15 +5,44 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard, type ProductCardData } from "@/components/product-card";
+import { buildMeta } from "@/lib/seo";
 
 const search = z.object({
   q: z.string().optional(),
   category: z.string().optional(),
 });
 
+const CATEGORY_SEO: Record<string, { title: string; description: string }> = {
+  drones: {
+    title: "Buy Professional Camera Drones & FPV Quadcopters",
+    description: "Shop SkyGear professional camera drones, foldable travel drones, FPV racing quadcopters and cinema UAVs. 4K, 8K sensors. Free shipping over $300.",
+  },
+  batteries: {
+    title: "Intelligent Flight Batteries for Drones",
+    description: "SkyGear intelligent flight batteries with onboard cell balancing, low-temp performance and up to 46-minute flight time. Compatible with Pro X1 and more.",
+  },
+  gimbals: {
+    title: "Drone Gimbals & Aerial Camera Stabilizers",
+    description: "3-axis handheld gimbals and aerial camera stabilizers for professional drone filmmaking. Brushless motors, 12-hour battery life.",
+  },
+  accessories: {
+    title: "Drone Accessories — Controllers, Cases & Filters",
+    description: "Smart controllers, hardshell travel cases, ND filter sets, low-noise propellers and drone accessories for professional pilots.",
+  },
+};
+
 export const Route = createFileRoute("/shop")({
   validateSearch: search,
-  head: () => ({ meta: [{ title: "Shop — SkyGear Drones" }, { name: "description", content: "Browse the SkyGear catalog: drones, batteries, gimbals and accessories." }] }),
+  head: (ctx) => {
+    const s = ctx.search || {};
+    const cat = s.category ? CATEGORY_SEO[s.category] : undefined;
+    const seo = buildMeta({
+      title: cat?.title ?? (s.q ? `Search: ${s.q}` : "Shop Drones, Batteries & Accessories"),
+      description: cat?.description ?? "Browse the SkyGear catalog: professional camera drones, FPV quadcopters, intelligent flight batteries, gimbals and drone accessories.",
+      path: s.category ? `/shop?category=${s.category}` : s.q ? `/shop?q=${encodeURIComponent(s.q)}` : "/shop",
+    });
+    return { meta: seo.meta, links: seo.links };
+  },
   component: Shop,
 });
 

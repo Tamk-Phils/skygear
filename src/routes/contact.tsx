@@ -4,16 +4,18 @@ import { SiteFooter } from "@/components/site-footer";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { buildMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact — SkyGear Drones" },
-      { name: "description", content: "Get in touch with SkyGear support, sales, or press. We reply within one business day." },
-      { property: "og:title", content: "Contact SkyGear" },
-      { property: "og:description", content: "Reach our support and sales teams — real pilots, real answers." },
-    ],
-  }),
+  head: () => {
+    const seo = buildMeta({
+      title: "Contact SkyGear — Drone Support & Sales",
+      description:
+        "Contact SkyGear drone support, sales, warranty and bulk order teams. Real pilots answer within one business day. Portland HQ. hello@skygear.com",
+      path: "/contact",
+    });
+    return { meta: seo.meta, links: seo.links };
+  },
   component: Contact,
 });
 

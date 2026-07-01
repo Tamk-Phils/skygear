@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://skygear.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://skygear.com/shop</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://skygear.com/shop?category=drones</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/shop?category=batteries</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/shop?category=gimbals</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/shop?category=accessories</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/guides</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/shipping</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://skygear.com/warranty</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://skygear.com/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://skygear.com/terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://skygear.com/product/skygear-pro-x1</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/product/skygear-mini-fold</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/product/skygear-fpv-racer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/product/skygear-cinema-8k</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skygear.com/product/intelligent-flight-battery</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/product/low-noise-propellers</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/product/handheld-gimbal</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/product/smart-controller</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/product/hardshell-case</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skygear.com/product/nd-filter-set</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+</urlset>

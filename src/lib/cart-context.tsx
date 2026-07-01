@@ -25,6 +25,7 @@ type CartCtx = {
   addItem: (productId: string, quantity?: number) => Promise<void>;
   updateItem: (id: string, quantity: number) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
+  clearCart: () => Promise<void>;
   refresh: () => Promise<void>;
 };
 
@@ -75,10 +76,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     await refresh();
   };
 
+  const clearCart = async () => {
+    if (!user) return;
+    const { error } = await supabase.from("cart_items").delete().eq("user_id", user.id);
+    if (error) { console.error(error); return; }
+    setItems([]);
+  };
+
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = items.reduce((s, i) => s + i.quantity * Number(i.product.price), 0);
 
-  return <Ctx.Provider value={{ items, count, subtotal, loading, addItem, updateItem, removeItem, refresh }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ items, count, subtotal, loading, addItem, updateItem, removeItem, clearCart, refresh }}>{children}</Ctx.Provider>;
 }
 
 export function useCart() {

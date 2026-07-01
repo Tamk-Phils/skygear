@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useCart } from "@/lib/cart-context";
+import { resolveImageUrl } from "@/lib/images";
+import { ProductImage } from "@/components/product-image";
 import { ShoppingBag } from "lucide-react";
 
 export type ProductCardData = {
@@ -13,15 +15,11 @@ export type ProductCardData = {
 
 export function ProductCard({ p }: { p: ProductCardData }) {
   const { addItem } = useCart();
-  const img = p.images?.[0];
+  const img = resolveImageUrl(p.images?.[0], p.slug);
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition hover:shadow-lg">
       <Link to="/product/$slug" params={{ slug: p.slug }} className="relative aspect-square overflow-hidden bg-muted">
-        {img ? (
-          <img src={img} alt={p.name} loading="lazy" className="size-full object-cover transition duration-500 group-hover:scale-105" />
-        ) : (
-          <div className="grid size-full place-items-center text-xs text-muted-foreground">No image</div>
-        )}
+        <ProductImage src={img} slug={p.slug} alt={p.name} loading="lazy" className="size-full object-cover transition duration-500 group-hover:scale-105" />
         {p.compare_at_price && Number(p.compare_at_price) > Number(p.price) && (
           <span className="absolute left-3 top-3 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase text-primary-foreground">Sale</span>
         )}

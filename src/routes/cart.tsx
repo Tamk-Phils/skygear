@@ -3,10 +3,21 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useCart } from "@/lib/cart-context";
 import { useAuth } from "@/lib/auth-context";
+import { ProductImage } from "@/components/product-image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
+import { buildMeta } from "@/lib/seo";
+
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Cart — SkyGear" }] }),
+  head: () => {
+    const seo = buildMeta({
+      title: "Shopping Cart",
+      description: "Your SkyGear drone shopping cart.",
+      path: "/cart",
+      noindex: true,
+    });
+    return { meta: seo.meta, links: seo.links };
+  },
   component: CartPage,
 });
 
@@ -36,7 +47,12 @@ function CartPage() {
               {items.map(it => (
                 <div key={it.id} className="flex gap-4 p-4">
                   <div className="size-24 shrink-0 overflow-hidden rounded bg-muted">
-                    {it.product.images?.[0] && <img src={it.product.images[0]} alt={it.product.name} className="size-full object-cover" />}
+                    <ProductImage
+                      src={it.product.images?.[0]}
+                      slug={it.product.slug}
+                      alt={it.product.name}
+                      className="size-full object-cover"
+                    />
                   </div>
                   <div className="flex flex-1 flex-col">
                     <Link to="/product/$slug" params={{ slug: it.product.slug }} className="font-semibold hover:text-primary">{it.product.name}</Link>
@@ -63,8 +79,15 @@ function CartPage() {
                   <span>Total</span><span className="text-primary">${(subtotal + (subtotal >= 300 ? 0 : 25)).toFixed(2)}</span>
                 </div>
               </div>
-              <button className="mt-6 w-full rounded-full bg-primary py-3 text-sm font-bold uppercase text-primary-foreground">Checkout</button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">Checkout is a demo — hook up a payment provider to enable it.</p>
+              <Link
+                to="/checkout"
+                className="mt-6 block w-full rounded-full bg-primary py-3 text-center text-sm font-bold uppercase text-primary-foreground hover:bg-primary/90"
+              >
+                Proceed to checkout
+              </Link>
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                Secure card payment — support will contact you to confirm your order.
+              </p>
             </aside>
           </div>
         )}

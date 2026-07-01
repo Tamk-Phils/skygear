@@ -6,8 +6,18 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { toast } from "sonner";
 
+import { buildMeta } from "@/lib/seo";
+
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — SkyGear" }] }),
+  head: () => {
+    const seo = buildMeta({
+      title: "Sign In",
+      description: "Sign in to your SkyGear account.",
+      path: "/auth",
+      noindex: true,
+    });
+    return { meta: seo.meta, links: seo.links };
+  },
   component: AuthPage,
 });
 

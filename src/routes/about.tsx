@@ -3,16 +3,18 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Award, Users, Globe2, Wrench } from "lucide-react";
 import heroImg from "@/assets/hero-drone.jpg";
+import { buildMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About — SkyGear Drones" },
-      { name: "description", content: "SkyGear builds professional drones and accessories for aerial creators, surveyors, and industry professionals." },
-      { property: "og:title", content: "About SkyGear" },
-      { property: "og:description", content: "Meet the team building the next generation of aerial imaging gear." },
-    ],
-  }),
+  head: () => {
+    const seo = buildMeta({
+      title: "About SkyGear — Drone Manufacturer Since 2018",
+      description:
+        "SkyGear builds professional camera drones, FPV racing quadcopters and cinema UAVs for aerial photographers, filmmakers, surveyors and pilots in 60+ countries. Portland-based since 2018.",
+      path: "/about",
+    });
+    return { meta: seo.meta, links: seo.links };
+  },
   component: About,
 });
 
