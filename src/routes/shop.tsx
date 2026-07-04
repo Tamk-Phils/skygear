@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
@@ -54,6 +55,14 @@ function Shop() {
     queryFn: async () => (await supabase.from("categories").select("*").order("sort_order")).data ?? [],
   });
 
+  // Sort categories so DJI drones ('drones' slug) appear first
+  const sortedCats = useMemo(() => {
+    if (!cats) return [];
+    const dronesCat = cats.find((c) => c.slug === "drones");
+    const otherCats = cats.filter((c) => c.slug !== "drones");
+    return dronesCat ? [dronesCat, ...otherCats] : cats;
+  }, [cats]);
+
   const { data: products, isLoading } = useQuery({
     queryKey: ["shop", q, category],
     queryFn: async () => {
@@ -65,7 +74,15 @@ function Shop() {
       if (error) throw error;
       let rows = data as any[];
       if (category) rows = rows.filter(r => r.category?.slug === category);
-      return rows as ProductCardData[];
+          // Prioritize DJI drones in product list
+    rows.sort((a, b) => {
+      const aDJI = a.name?.toLowerCase().includes('dji');
+      const bDJI = b.name?.toLowerCase().includes('dji');
+      if (aDJI && !bDJI) return -1;
+      if (!aDJI && bDJI) return 1;
+      return 0;
+    });
+    return rows as ProductCardData[];
     },
   });
 
@@ -90,7 +107,7 @@ function Shop() {
           >
             All
           </a>
-          {(cats ?? []).map((c) => (
+          {(sortedCats ?? []).map((c) => (
             <a
               key={c.id}
               href={`/shop?category=${c.slug}`}
@@ -106,7 +123,7 @@ function Shop() {
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Categories</h3>
             <ul className="space-y-1 text-sm">
               <li><a href="/shop" className={!category ? "font-semibold text-primary" : "hover:text-primary"}>All products</a></li>
-              {(cats ?? []).map(c => (
+              {(sortedCats ?? []).map(c => (
                 <li key={c.id}>
                   <a href={`/shop?category=${c.slug}`} className={category === c.slug ? "font-semibold text-primary" : "hover:text-primary"}>{c.name}</a>
                 </li>

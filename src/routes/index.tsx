@@ -224,9 +224,12 @@ function Home() {
                 <h3 className="mt-3 font-display text-2xl font-extrabold drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] sm:text-3xl">
                   {c.title}
                 </h3>
-                <span className="mt-4 inline-flex w-fit rounded-full bg-white/10 px-5 py-2 text-xs font-bold uppercase tracking-wide transition hover:bg-white/15">
+                <Link
+                  to="/shop"
+                  className="mt-4 inline-flex w-fit rounded-full bg-white/10 px-5 py-2 text-xs font-bold uppercase tracking-wide transition hover:bg-white/15"
+                >
                   {c.cta}
-                </span>
+                </Link>
               </div>
             </Link>
           ))}
