@@ -39,7 +39,7 @@ export function ProductCard({
           slug={p.slug}
           alt={p.name}
           loading="lazy"
-          className="size-full object-cover transition duration-500 group-hover:scale-105"
+          className="size-full object-contain p-2"
         />
         {onSale && (
           <span className="absolute left-3 top-3 rounded-sm bg-destructive px-2 py-1 text-[10px] font-bold uppercase text-white">

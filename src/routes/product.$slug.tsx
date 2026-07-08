@@ -152,7 +152,7 @@ function ProductPage() {
               </nav>
 
               <div className="grid gap-10 md:grid-cols-2">
-                <div>
+                <div className="min-w-0">
                   <Carousel setApi={setApi} opts={{ loop: false }} className="relative">
                     <div className="overflow-hidden rounded-lg border border-border bg-muted">
                       <CarouselContent className="ml-0">
@@ -164,7 +164,7 @@ function ProductPage() {
                                   key={im}
                                   src={im}
                                   controls
-                                  className="size-full object-cover"
+                                  className="size-full object-contain"
                                   aria-label={`${product.name} — product video`}
                                 />
                               ) : (
@@ -172,7 +172,7 @@ function ProductPage() {
                                   src={im}
                                   slug={product.slug}
                                   alt={`${product.name} — SkyGear professional drone`}
-                                  className="size-full object-cover"
+                                  className="size-full object-contain"
                                 />
                               )}
                             </div>
@@ -214,7 +214,7 @@ function ProductPage() {
                             >
                               {isVideoUrl(im) ? (
                                 <>
-                                  <video src={im} className="size-full object-cover" muted />
+                                  <video src={im} className="size-full object-contain" muted />
                                   <span className="pointer-events-none absolute left-0.5 top-0.5 rounded bg-black/70 px-1 py-px text-[8px] font-bold uppercase text-white">
                                     ▶
                                   </span>
@@ -224,7 +224,7 @@ function ProductPage() {
                                   src={im}
                                   slug={product.slug}
                                   alt=""
-                                  className="size-full object-cover"
+                                  className="size-full object-contain"
                                 />
                               )}
                             </button>

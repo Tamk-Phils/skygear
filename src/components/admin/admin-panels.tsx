@@ -163,9 +163,9 @@ function AdminMediaUpload({
               className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
             >
               {isVideoUrl(url) ? (
-                <video src={url} className="size-full object-cover" muted />
+                <video src={url} className="size-full object-contain" muted />
               ) : (
-                <img src={url} alt="" className="size-full object-cover" />
+                <img src={url} alt="" className="size-full object-contain" />
               )}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                 <div className="flex gap-1">
