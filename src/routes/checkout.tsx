@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { ProductImage } from "@/components/product-image";
 import { buildMeta } from "@/lib/seo";
 import { CreditCard, Lock, Mail, Phone, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { createServerFn } from "@tanstack/react-start";
@@ -54,7 +54,14 @@ function CheckoutPage() {
   const [cvc, setCvc] = useState("");
   const [busy, setBusy] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [contactEmail, setContactEmail] = useState("");
   const [orderRef, setOrderRef] = useState("");
+
+  useEffect(() => {
+    if (user?.email && !contactEmail) {
+      setContactEmail(user.email);
+    }
+  }, [user, contactEmail]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +80,7 @@ function CheckoutPage() {
         subtotal,
         shipping,
         total,
-        customer_email: user.email ?? null,
+        customer_email: contactEmail || user.email || null,
         card_name: cardName,
         card_last_four: cardLastFour || null,
       })
@@ -106,7 +113,7 @@ function CheckoutPage() {
       await submitCheckoutEmail({
         data: {
           orderId: ref,
-          customerEmail: user.email ?? "unknown@example.com",
+          customerEmail: contactEmail || user.email || "unknown@example.com",
           customerName: cardName,
           total,
         },
@@ -277,7 +284,16 @@ function CheckoutPage() {
 
             <section className="rounded-lg border border-border bg-card p-4 sm:p-6">
               <h2 className="font-display text-lg font-bold">Billing contact</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
+              <label className="mt-4 block">
+                <span className="text-xs font-semibold uppercase text-muted-foreground">Email address</span>
+                <input
+                  required
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
+                />
+              </label>
               <p className="mt-3 text-xs text-muted-foreground">
                 Shipping address and delivery options will be confirmed by our support team after payment
                 review. For bulk orders or international shipping, mention your requirements when contacted.

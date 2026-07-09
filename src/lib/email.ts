@@ -43,6 +43,19 @@ export const sendContactEmail = async ({
       <p style="white-space: pre-wrap;">${message}</p>
     `,
   });
+
+  // Send confirmation to the customer
+  await transporter.sendMail({
+    from: `"SkyGear Support" <${process.env.SPACEMAIL_EMAIL}>`,
+    to: email,
+    subject: `We've received your message: ${subject}`,
+    text: `Hi ${name},\n\nWe have received your information and our support team will get back to you shortly.\n\nThank you,\nThe SkyGear Team`,
+    html: `
+      <p>Hi ${name},</p>
+      <p>We have received your information and our support team will get back to you shortly.</p>
+      <p>Thank you,<br/>The SkyGear Team</p>
+    `,
+  });
 };
 
 export const sendCheckoutEmail = async ({
@@ -69,6 +82,21 @@ export const sendCheckoutEmail = async ({
       <p><strong>Order ID:</strong> #${orderId}</p>
       <p><strong>Customer:</strong> ${customerName} (${customerEmail})</p>
       <p><strong>Total:</strong> $${total.toFixed(2)}</p>
+    `,
+  });
+
+  // Send confirmation to the customer
+  await transporter.sendMail({
+    from: `"SkyGear Orders" <${process.env.SPACEMAIL_EMAIL}>`,
+    to: customerEmail,
+    subject: `Order Confirmation: #${orderId}`,
+    text: `Hi ${customerName},\n\nThank you for your order! Your order will be processed and support is going to get back to you shortly with shipping details.\n\nOrder ID: #${orderId}\nTotal: $${total.toFixed(2)}\n\nThank you,\nThe SkyGear Team`,
+    html: `
+      <p>Hi ${customerName},</p>
+      <p>Thank you for your order! Your order will be processed and support is going to get back to you shortly with shipping details.</p>
+      <p><strong>Order ID:</strong> #${orderId}</p>
+      <p><strong>Total:</strong> $${total.toFixed(2)}</p>
+      <p>Thank you,<br/>The SkyGear Team</p>
     `,
   });
 };
