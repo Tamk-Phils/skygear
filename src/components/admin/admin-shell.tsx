@@ -5,11 +5,12 @@ import {
   FolderTree,
   ShoppingCart,
   Users,
+  Star,
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type AdminTab = "overview" | "products" | "categories" | "orders" | "users";
+export type AdminTab = "overview" | "products" | "categories" | "orders" | "users" | "reviews";
 
 const NAV: { id: AdminTab; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -17,6 +18,7 @@ const NAV: { id: AdminTab; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "categories", label: "Categories", icon: FolderTree },
   { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "users", label: "Users", icon: Users },
+  { id: "reviews", label: "Reviews", icon: Star },
 ];
 
 export function AdminShell({

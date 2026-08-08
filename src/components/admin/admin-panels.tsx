@@ -1155,3 +1155,184 @@ export function UsersPanel() {
     </div>
   );
 }
+
+type ReviewRow = {
+  id: string;
+  product_id: string;
+  author_name: string;
+  rating: number;
+  content: string;
+  created_at: string;
+  product: { name: string } | null;
+};
+
+export function ReviewsPanel() {
+  const qc = useQueryClient();
+  const [formOpen, setFormOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({ product_id: "", author_name: "", rating: "5", content: "" });
+
+  const { data: reviews, isLoading } = useQuery({
+    queryKey: ["admin-reviews"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select("*, product:products(name)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as ReviewRow[];
+    },
+  });
+
+  const { data: products } = useQuery({
+    queryKey: ["admin-products"],
+    queryFn: async () =>
+      (await supabase.from("products").select("id, name").order("name")).data ?? [],
+  });
+
+  const openCreate = () => {
+    setForm({ product_id: "", author_name: "", rating: "5", content: "" });
+    setFormOpen(true);
+  };
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.from("product_reviews").insert({
+      product_id: form.product_id,
+      author_name: form.author_name,
+      rating: Number(form.rating),
+      content: form.content,
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Review added");
+    setFormOpen(false);
+    qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+    qc.invalidateQueries({ queryKey: ["product-reviews"] });
+  };
+
+  const del = async (id: string) => {
+    if (!confirm("Delete this review?")) return;
+    const { error } = await supabase.from("product_reviews").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Review deleted");
+    qc.invalidateQueries({ queryKey: ["admin-reviews"] });
+    qc.invalidateQueries({ queryKey: ["product-reviews"] });
+  };
+
+  return (
+    <div>
+      <AdminSectionHeader
+        title="Product Reviews"
+        description="Manage customer reviews for products."
+        action={
+          <Button onClick={openCreate} className="gap-2">
+            <Plus className="size-4" /> Add review
+          </Button>
+        }
+      />
+
+      <AdminTableWrap>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Author</TableHead>
+              <TableHead>Product</TableHead>
+              <TableHead>Rating</TableHead>
+              <TableHead>Review</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                  Loading reviews…
+                </TableCell>
+              </TableRow>
+            ) : reviews?.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                  No reviews found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              reviews?.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-medium">{r.author_name}</TableCell>
+                  <TableCell>{r.product?.name ?? "Unknown Product"}</TableCell>
+                  <TableCell>{r.rating} / 5</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-muted-foreground" title={r.content}>
+                    {r.content}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" onClick={() => del(r.id)}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </AdminTableWrap>
+
+      <Dialog open={formOpen} onOpenChange={setFormOpen}>
+        <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-md overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Review</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={save} className="space-y-3">
+            <AdminField label="Product">
+              <select
+                required
+                value={form.product_id}
+                onChange={(e) => setForm({ ...form, product_id: e.target.value })}
+                className={adminInput}
+              >
+                <option value="">— Select a product —</option>
+                {products?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+            <AdminField label="Author Name">
+              <input
+                required
+                value={form.author_name}
+                onChange={(e) => setForm({ ...form, author_name: e.target.value })}
+                className={adminInput}
+              />
+            </AdminField>
+            <AdminField label="Rating (1-5)">
+              <input
+                required
+                type="number"
+                min="1"
+                max="5"
+                value={form.rating}
+                onChange={(e) => setForm({ ...form, rating: e.target.value })}
+                className={adminInput}
+              />
+            </AdminField>
+            <AdminField label="Review Content">
+              <textarea
+                required
+                rows={4}
+                value={form.content}
+                onChange={(e) => setForm({ ...form, content: e.target.value })}
+                className={adminInput}
+              />
+            </AdminField>
+            <Button type="submit" disabled={busy} className="w-full">
+              {busy ? "Saving…" : "Save Review"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

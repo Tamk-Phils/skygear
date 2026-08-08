@@ -11,6 +11,7 @@ import {
   CategoriesPanel,
   OrdersPanel,
   UsersPanel,
+  ReviewsPanel,
 } from "@/components/admin/admin-panels";
 import { buildMeta } from "@/lib/seo";
 
@@ -58,6 +59,7 @@ function AdminPage() {
       {tab === "categories" && <CategoriesPanel />}
       {tab === "orders" && <OrdersPanel />}
       {tab === "users" && <UsersPanel />}
+      {tab === "reviews" && <ReviewsPanel />}
     </AdminShell>
   );
 }
