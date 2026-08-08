@@ -133,6 +133,29 @@ function Home() {
     },
   });
 
+  const { data: dbReviews } = useQuery({
+    queryKey: ["home-reviews"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select("*, product:products(name)")
+        .order("created_at", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const displayReviews = dbReviews?.length
+    ? dbReviews.map((r: any) => ({
+        quote: r.content,
+        author: r.author_name,
+        handle: r.product?.name ?? "Verified Buyer",
+        role: "Customer",
+        rating: r.rating,
+      }))
+    : TESTIMONIALS.map((t) => ({ ...t, rating: 5 }));
+
   const { data: products } = useQuery({
     queryKey: ["home-products"],
     queryFn: async () => {
@@ -398,12 +421,12 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 py-14">
           <SectionHeading title="What pilots are saying" />
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
+            {displayReviews.map((t, idx) => (
               <blockquote
-                key={t.author}
+                key={t.author + idx}
                 className="rounded-lg border border-border bg-card p-5 shadow-sm"
               >
-                <ProductRating rating={5} compact />
+                <ProductRating rating={t.rating} compact />
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">&ldquo;{t.quote}&rdquo;</p>
                 <footer className="mt-4 border-t border-border pt-4">
                   <div className="text-sm font-semibold">{t.author}</div>
