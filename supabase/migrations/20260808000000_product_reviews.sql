@@ -21,16 +21,16 @@ USING (true);
 CREATE POLICY "Admins can insert product reviews" 
 ON public.product_reviews 
 FOR INSERT 
-WITH CHECK (public.has_role('admin', auth.uid()));
+WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
 -- Allow admins to update reviews
 CREATE POLICY "Admins can update product reviews" 
 ON public.product_reviews 
 FOR UPDATE 
-USING (public.has_role('admin', auth.uid()));
+USING (public.has_role(auth.uid(), 'admin'));
 
 -- Allow admins to delete reviews
 CREATE POLICY "Admins can delete product reviews" 
 ON public.product_reviews 
 FOR DELETE 
-USING (public.has_role('admin', auth.uid()));
+USING (public.has_role(auth.uid(), 'admin'));
