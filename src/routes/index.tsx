@@ -146,15 +146,16 @@ function Home() {
     },
   });
 
-  const displayReviews = dbReviews?.length
-    ? dbReviews.map((r: any) => ({
-        quote: r.content,
-        author: r.author_name,
-        handle: r.product?.name ?? "Verified Buyer",
-        role: "Customer",
-        rating: r.rating,
-      }))
-    : TESTIMONIALS.map((t) => ({ ...t, rating: 5 }));
+  const displayReviews = [
+    ...(dbReviews ?? []).map((r: any) => ({
+      quote: r.content,
+      author: r.author_name,
+      handle: r.product?.name ?? "Verified Buyer",
+      role: "Customer",
+      rating: r.rating,
+    })),
+    ...TESTIMONIALS.map((t) => ({ ...t, rating: 5 })),
+  ];
 
   const { data: products } = useQuery({
     queryKey: ["home-products"],
