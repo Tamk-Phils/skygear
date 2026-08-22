@@ -32,7 +32,7 @@ export default defineConfig(({ command, mode }) => {
         ? [netlify()]
         : [
             nitro({
-              defaultPreset: "cloudflare-module",
+              defaultPreset: "vercel",
               externals: {
                 trace: false,
               },
