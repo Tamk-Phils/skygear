@@ -141,7 +141,10 @@ function Home() {
         .select("*, product:products(name)")
         .order("created_at", { ascending: false })
         .limit(6);
-      if (error) throw error;
+      if (error) {
+        console.error("Failed to fetch reviews:", error);
+        return [];
+      }
       return data;
     },
   });
