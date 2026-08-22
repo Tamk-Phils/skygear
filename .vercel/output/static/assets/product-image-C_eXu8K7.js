@@ -1,1 +1,0 @@
-import{Q as e,et as t,m as n}from"./dist-DB7kzR7g.js";import{i as r,n as i}from"./index-De7vzyTa.js";var a=t(e(),1),o=n();function s({src:e,slug:t,alt:n,className:s,loading:c}){let l=r(e??void 0,t),[u,d]=(0,a.useState)(l);return(0,a.useEffect)(()=>{d(l)},[l]),(0,o.jsx)(`img`,{src:u,alt:n,loading:c,className:s,onError:()=>{u!==i.placeholder&&d(i.placeholder)}})}export{s as t};
